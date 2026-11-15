@@ -118,11 +118,16 @@ const server = http.createServer((req, res) => {
       }
       try {
         const started = Date.now();
-        const { decision, reason_code } = decide(task);
+        // Platform envelopes wrap the condition fields in `input`; decide/prove
+        // work on the flat shape (task_id stays at envelope level).
+        const input = task && typeof task.input === 'object' && task.input ? task.input : {};
+        const flatTask = { ...input, task_id: task.task_id };
+        const { decision, reason_code } = decide(flatTask);
         const out = { decision, reason_code };
+        if (flatTask.proof_tx) out.proof_tx = flatTask.proof_tx;
         if (reason_code !== 'PROOF_REUSED') {
           try {
-            const { proof, publicSignals } = await proveTask(task, decision, TASK_ID_MODE);
+            const { proof, publicSignals } = await proveTask(flatTask, decision, TASK_ID_MODE);
             out.proof = proof;
             out.public_signals = publicSignals;
           } catch (e) {
