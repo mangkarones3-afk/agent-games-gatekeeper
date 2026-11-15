@@ -64,31 +64,7 @@ function sendSigned(res, status, obj) {
   res.end(body);
 }
 
-const BRIDGE_HTML = `<!doctype html><meta charset="utf-8"><title>Continue</title>
-<p style="font-family:sans-serif">Continuing to Agent Games…</p>
-<script>
-try {
-  var d = JSON.parse(decodeURIComponent(location.hash.slice(1)));
-  var f = document.createElement('form');
-  f.method = 'POST';
-  f.action = 'https://agentgames.zkverify.io/api/auth/callback/wallet';
-  [['csrfToken', d.csrfToken], ['message', d.message], ['signature', d.signature],
-   ['callbackUrl', 'https://agentgames.zkverify.io/dashboard/settings']].forEach(function (kv) {
-    var i = document.createElement('input');
-    i.type = 'hidden'; i.name = kv[0]; i.value = kv[1];
-    f.appendChild(i);
-  });
-  document.body.appendChild(f);
-  f.submit();
-} catch (e) { document.body.textContent = 'Invalid link.'; }
-</script>`;
-
 const server = http.createServer((req, res) => {
-  if (req.method === 'GET' && req.url === '/__bridge') {
-    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-    return res.end(BRIDGE_HTML);
-  }
-
   if (req.method === 'GET' && req.url === '/health') {
     return sendSigned(res, 200, {
       ok: true,
