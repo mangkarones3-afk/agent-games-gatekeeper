@@ -1,0 +1,10 @@
+node_modules/
+.env
+session-cookies.txt
+*.log
+bin/
+circuits/*.wasm
+circuits/*.zkey
+add-agent-resp.txt
+tm.log
+tunnel*.log
